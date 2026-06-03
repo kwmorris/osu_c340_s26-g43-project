@@ -15,9 +15,9 @@ app.listen(PORT, async () => {
 
 let con = mysql.createConnection({
   host: "classmysql.engr.oregonstate.edu",
-  user: "cs340_morrisk7",
-  password: "3454",
-  database: "cs340_morrisk7"
+  user: "",
+  password: "",
+  database: ""
 });
 
 con.connect(function(err) {
