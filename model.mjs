@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import mysql from 'mysql';
+import dotenv from 'dotenv';
 
 
 const app = express();
@@ -13,11 +14,12 @@ app.listen(PORT, async () => {
     console.log(`Server listening on port ${PORT}...`);
 });
 
+dotenv.config()
 let con = mysql.createConnection({
-  host: "classmysql.engr.oregonstate.edu",
-  user: "",
-  password: "",
-  database: ""
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_TABLE
 });
 
 con.connect(function(err) {
@@ -26,6 +28,7 @@ con.connect(function(err) {
 });
 
 app.get("/reset", (req, res) => {
+  console.log("Reset requested")
   const sqlQuery = "CALL ResetAssignmentTrackerDB;"
    con.query(sqlQuery, function (err, result, fields) {
     if (err) throw err;
@@ -57,6 +60,23 @@ app.get("/assignments", (req, res) => {
   });
 });
 
+app.post("/assignments", (req, res) => {
+  console.log("Create assignment requested.")
+  console.log(req.body)
+  const assignmentName = req.body.name;
+  const assignmentDescription = req.body.description;
+  const assignmentDueDate = req.body.dueDate;
+  const assignmentPoints = req.body.points;
+  const callProcedure = `CALL CreateAssignment ("${assignmentName}", "${assignmentDescription}", "${assignmentDueDate}", ${assignmentPoints});;`
+  console.log(callProcedure)
+  con.query(callProcedure, function (err, result, fields) {
+    if (err) return res.json({ error: err });
+    res.json(result);
+    console.log(result);
+  });
+  
+});
+
 app.get("/submissions", (req, res) => {
   const sqlQuery =`SELECT
         Submissions.submissionID,
@@ -84,7 +104,7 @@ app.get("/remove/submissions/:id", (req, res) => {
   const submissionID = parseInt(req.params.id);
   console.log(`Delete request for Submisison ${submissionID}`)
   const sqlQuery = `CALL DeleteSubmission(${submissionID})`
-   con.query(sqlQuery, function (err, result, fields) {
+  con.query(sqlQuery, function (err, result, fields) {
     if (err) return res.json({ error: err });
     res.json(result);
     console.log(result);

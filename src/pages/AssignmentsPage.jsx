@@ -1,9 +1,14 @@
-import { useState } from 'react';
-import assignmentsData from '../data/assignments';
+import { useState, useEffect } from 'react';
+// import assignmentsData from '../data/assignments';
 import AssignmentsTable from '../components/AssignmentsTable';
+import axios from 'axios';
+
+// const HOST = 'classwork.engr.oregonstate.edu';
+const HOST = 'localhost';
+const PORT = 13331;
 
 function AssignmentsPage() {
-    const [assignments, setAssignments] = useState(assignmentsData);
+    const [assignments, setAssignments] = useState([]);
 
     const blankAssignment = {
         assignmentID: '',
@@ -13,57 +18,33 @@ function AssignmentsPage() {
         points: ''
     };
 
+    useEffect(() => {
+        console.log("Refresh Table")    
+        refreshTable();
+    });
+
+    function refreshTable() {
+        axios.get(`http://${HOST}:${PORT}/assignments`)
+            .then(res => setAssignments(res.data))
+            .catch(err => console.log(err));
+    };
+
     const [newAssignment, setNewAssignment] = useState(blankAssignment);
-    const [updateAssignment, setUpdateAssignment] = useState(blankAssignment);
-    const [selectedAssignmentID, setSelectedAssignmentID] = useState('');
-    const [deleteAssignmentID, setDeleteAssignmentID] = useState('');
 
     function handleNewChange(e) {
         setNewAssignment({ ...newAssignment, [e.target.name]: e.target.value });
     }
 
-    function handleUpdateChange(e) {
-        setUpdateAssignment({ ...updateAssignment, [e.target.name]: e.target.value });
-    }
-
     function addAssignment(e) {
         e.preventDefault();
-        setAssignments([...assignments, newAssignment]);
+        let url = `http://${HOST}:${PORT}/assignments`
+        axios.post(url, newAssignment)
+            .catch(err => console.log(err))
+            .then(response => {
+                console.log("Post response")
+                refreshTable()
+            });
         setNewAssignment(blankAssignment);
-    }
-
-    function selectAssignment(e) {
-        const id = e.target.value;
-        setSelectedAssignmentID(id);
-
-        const assignment = assignments.find((a) => a.assignmentID.toString() === id);
-        if (assignment) {
-            setUpdateAssignment(assignment);
-        }
-    }
-
-    function updateExistingAssignment(e) {
-        e.preventDefault();
-
-        setAssignments(
-            assignments.map((assignment) =>
-                assignment.assignmentID.toString() === selectedAssignmentID
-                    ? updateAssignment
-                    : assignment
-            )
-        );
-    }
-
-    function deleteAssignment(e) {
-        e.preventDefault();
-
-        setAssignments(
-            assignments.filter(
-                (assignment) => assignment.assignmentID.toString() !== deleteAssignmentID
-            )
-        );
-
-        setDeleteAssignmentID('');
     }
 
     return (
@@ -75,7 +56,6 @@ function AssignmentsPage() {
 
             <h3>Add Assignment</h3>
             <form onSubmit={addAssignment}>
-                <input name="assignmentID" placeholder="Assignment ID" value={newAssignment.assignmentID} onChange={handleNewChange} />
                 <input name="name" placeholder="Assignment Name" value={newAssignment.name} onChange={handleNewChange} />
                 <input name="description" placeholder="Description" value={newAssignment.description} onChange={handleNewChange} />
                 <input name="dueDate" placeholder="Due Date" value={newAssignment.dueDate} onChange={handleNewChange} />
@@ -83,7 +63,7 @@ function AssignmentsPage() {
                 <button type="submit">Add Assignment</button>
             </form>
 
-            <hr />
+            {/* <hr />
 
             <h3>Update Assignment</h3>
             <form onSubmit={updateExistingAssignment}>
@@ -119,7 +99,7 @@ function AssignmentsPage() {
                 </select>
 
                 <button type="submit">Delete Assignment</button>
-            </form>
+            </form> */}
         </main>
     );
 }
