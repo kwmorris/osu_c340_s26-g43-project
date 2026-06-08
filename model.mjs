@@ -15,17 +15,35 @@ app.listen(PORT, async () => {
 });
 
 dotenv.config()
-let con = mysql.createConnection({
+var dbConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_TABLE
-});
+};
 
-con.connect(function(err) {
-  if (err) throw err;
-  console.log("DB Connected!");
-});
+var dbConnection;
+function handleDisconnect() {
+  dbConnection = mysql.createConnection(dbConfig);
+  dbConnection.connect( function onConnect(err) {
+    if (err) {
+      console.log('error when connecting to DB:', err);
+      setTimeout(handleDisconnect, 10000);
+    }
+    console.log('DB Connected');
+  });
+
+  dbConnection.on('error', function onError(err){
+    console.log('db error', err);
+    if (err.code == 'ECONNRESET') {
+      handleDisconnect();
+    } else {
+      throw err;
+    }
+  });
+}
+handleDisconnect();
+
 
 app.get("/reset", (req, res) => {
   console.log("Reset requested")
