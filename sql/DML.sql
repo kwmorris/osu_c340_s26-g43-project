@@ -1,3 +1,5 @@
+-- AI tools were not used in the development of this file
+
 -- Students table queries
 
 -- Select all attributes for all Students
