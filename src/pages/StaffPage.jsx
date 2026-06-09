@@ -11,13 +11,20 @@ function StaffPage() {
     // State variable for the page
     const [staff, setStaff] = useState([]);
 
-    // Refresh the table
+    // Refresh the tables
     useEffect(() => {
-        setTimeout(refreshTable(), 5000);
-    });
+        refreshTable();
+
+        const interval = setInterval(refreshTable, 5000);
+
+        return() => {
+            console.log("Clear Interval")
+            clearInterval(interval);
+        }
+    }, []);
 
     function refreshTable() {
-        console.log("Refresh table")
+        console.log("Refresh Staff table")
         axios.get(`http://${HOST}:${PORT}/staff`)
             .then(res => setStaff(res.data))
             .catch(err => console.log(err));

@@ -12,13 +12,20 @@ function StudentsPage() {
     const [students, setStudents] = useState([]);
     const [deleteStudentID, setDeleteStudentID] = useState('');
 
-    // Refresh the table
+    // Refresh the tables
     useEffect(() => {
-        setTimeout(refreshTable(), 5000);
-    });
+        refreshTable();
+
+        const interval = setInterval(refreshTable, 5000);
+
+        return() => {
+            console.log("Clear Interval")
+            clearInterval(interval);
+        }
+    }, []);
 
     function refreshTable() {
-        console.log("Refresh table")
+        console.log("Refresh Students table")
         axios.get(`http://${HOST}:${PORT}/students`)
             .then(res => setStudents(res.data))
             .catch(err => console.log(err));

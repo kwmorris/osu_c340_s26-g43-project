@@ -21,12 +21,20 @@ function HomePage() {
     const [submissions, setSubmissions] = useState([]);
     const [courses, setCourses] = useState([]);
     
-    // Refresht the tables
+    // Refresh the tables
     useEffect(() => {
-        setTimeout(refreshTables(), 5000);
-    });
+        refreshTables();
+
+        const interval = setInterval(refreshTables, 5000);
+
+        return() => {
+            console.log("Clear Interval")
+            clearInterval(interval);
+        }
+    }, []);
 
     function refreshTables() {
+        console.log("Refresh Home tables");
         getStudents();
         getStaff();
         getAssignments();

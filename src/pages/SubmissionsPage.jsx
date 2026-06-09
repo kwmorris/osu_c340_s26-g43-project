@@ -37,10 +37,17 @@ function SubmissionsPage() {
     const [updateSubmission, setUpdateSubmission] = useState(blankSubmission);
     const [selectedSubmissionID, setSelectedSubmissionID] = useState('');
 
-    // Refresht the tables
+    // Refresh the tables
     useEffect(() => {
-        setTimeout(refreshTables(), 5000);
-    });
+        refreshTables();
+
+        const interval = setInterval(refreshTables, 5000);
+
+        return() => {
+            console.log("Clear Interval")
+            clearInterval(interval);
+        }
+    }, []);
 
     function refreshTables() {
         refreshSubmissionsTable();
@@ -66,7 +73,7 @@ function SubmissionsPage() {
 
     // Get data for the table on the page
     function refreshSubmissionsTable() {
-        console.log("Refresh table")
+        console.log("Refresh Submissions table")
         axios.get(`http://${HOST}:${PORT}/submissions`)
             .then(res => {
                 setSubmissions(res.data);
