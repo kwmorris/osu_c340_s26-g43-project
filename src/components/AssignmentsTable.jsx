@@ -1,3 +1,5 @@
+// Citation: All work in this file is our own, AI tools were not used in the generation of this file. 
+
 import AssignmentRow from "./AssignmentRow";
 
 function AssignmentsTable ({ assignments }) {
@@ -6,6 +8,7 @@ function AssignmentsTable ({ assignments }) {
             <thead>
                 <tr>
                     <th>Assignment ID</th>
+                    <th>Course Name</th>
                     <th>Name</th>
                     <th>Description</th>
                     <th>Due Date</th>

@@ -1,7 +1,10 @@
+// Citation: All work in this file is our own, AI tools were not used in the generation of this file. 
+
 function AssignmentRow ({ assignment }) {
     return (
         <tr>
             <td>{assignment.assignmentID}</td>
+            <td>{assignment.courseName}</td>
             <td>{assignment.name}</td>
             <td>{assignment.description}</td>
             <td>{assignment.dueDate}</td>

@@ -1,5 +1,5 @@
 /* Citations:
-  Citation for the 'handleDisconnect' function: 
+  #1: Citation for the 'handleDisconnect' function: 
   Date: 08JUN2026
   Adapted from Stack Overflow
   The function and error handling code from the source have been adapated to target a different error
@@ -7,6 +7,8 @@
   Source URL: https://stackoverflow.com/questions/37385833/node-js-mysql-database-disconnect
   if AI tools were used
     No AI tools were used in generating this code.
+
+  All other work is our own.
 */
 
 import express from 'express';
@@ -15,6 +17,7 @@ import mysql from 'mysql';
 import dotenv from 'dotenv';
 
 
+// Creatation and start up of the API app
 const app = express();
 app.use(cors())
 app.use(express.json());
@@ -25,6 +28,8 @@ app.listen(PORT, async () => {
     console.log(`Server listening on port ${PORT}...`);
 });
 
+
+// Connection to the DB
 dotenv.config()
 var dbConfig = {
   host: process.env.DB_HOST,
@@ -33,20 +38,25 @@ var dbConfig = {
   database: process.env.DB_TABLE
 };
 
+// Adapted code #1
 var dbConnection;
 function handleDisconnect() {
   // Prepares a connection to the mySQL DB
   dbConnection = mysql.createConnection(dbConfig);
+  // Attempts to connect to the DB
   dbConnection.connect( function onConnect(err) {
     if (err) {
       console.log('error when connecting to DB:', err);
+      // Retry connection after 10 seconds
       setTimeout(handleDisconnect, 10000);
     }
     console.log('DB Connected');
   });
 
+  // Error handling after successfull connection
   dbConnection.on('error', function onError(err){
     console.log('db error', err);
+    // If the error is due to a reset connect, reconnect, otherwise throw the error
     if (err.code == 'ECONNRESET') {
       handleDisconnect();
     } else {
@@ -55,7 +65,9 @@ function handleDisconnect() {
   });
 }
 handleDisconnect();
+// End adapted code
 
+// Query execution to reset the DB
 app.get("/reset", (req, res) => {
   console.log("Reset requested")
   const sqlQuery = "CALL ResetAssignmentTrackerDB;"
@@ -65,6 +77,8 @@ app.get("/reset", (req, res) => {
   });
 });
 
+// Queries on the 'Students' table
+// SELECT *
 app.get("/students", (req, res) => {
   const sqlQuery = "SELECT * FROM Students;"
    dbConnection.query(sqlQuery, function (err, result, fields) {
@@ -73,6 +87,7 @@ app.get("/students", (req, res) => {
   });
 });
 
+// DELETE student
 app.delete("/students/:deleteID", (req, res) => {
   const deleteID = req.params.deleteID;
   console.log("Delete request for student:", deleteID);
@@ -84,6 +99,8 @@ app.delete("/students/:deleteID", (req, res) => {
   });
 });
 
+// Queries of the Staff table
+// SELECT *
 app.get("/staff", (req, res) => {
   const sqlQuery = "SELECT * FROM Staff;"
    dbConnection.query(sqlQuery, function (err, result, fields) {
@@ -92,22 +109,37 @@ app.get("/staff", (req, res) => {
   });
 });
 
+//Queries on the assignments table
+//SELECT *
 app.get("/assignments", (req, res) => {
-  const sqlQuery = "SELECT * FROM Assignments;";
+  const sqlQuery = `SELECT
+      Assignments.assignmentID,
+      Assignments.courseID,
+      Courses.courseCode,
+      Courses.courseName,
+      Assignments.name,
+      Assignments.description,
+      Assignments.dueDate,
+      Assignments.points
+    FROM Assignments
+    INNER JOIN Courses
+    ON Assignments.courseID = Courses.courseID;`;
    dbConnection.query(sqlQuery, function (err, result, fields) {
     if (err) return res.json({ error: err });
     res.json(result);
   });
 });
 
+// CREATE/INSERT
 app.post("/assignments", (req, res) => {
   console.log("Create assignment requested.")
   console.log(req.body)
+  const courseID = req.body.courseID;
   const assignmentName = req.body.name;
   const assignmentDescription = req.body.description;
   const assignmentDueDate = req.body.dueDate;
   const assignmentPoints = req.body.points;
-  const callProcedure = `CALL CreateAssignment ("${assignmentName}", "${assignmentDescription}", "${assignmentDueDate}", ${assignmentPoints});;`
+  const callProcedure = `CALL CreateAssignment (${courseID}, "${assignmentName}", "${assignmentDescription}", "${assignmentDueDate}", ${assignmentPoints});;`
   console.log(callProcedure)
   dbConnection.query(callProcedure, function (err, result, fields) {
     if (err) return res.json({ error: err });
@@ -117,6 +149,8 @@ app.post("/assignments", (req, res) => {
   
 });
 
+// Queries on the submissions table
+// SELECT *
 app.get("/submissions", (req, res) => {
   const sqlQuery =`SELECT
         Submissions.submissionID,
@@ -140,6 +174,7 @@ app.get("/submissions", (req, res) => {
   });
 });
 
+// UPDATE
 app.put("/submissions", (req,res) => {
   console.log(req.body);
   const submissionID = parseInt(req.body.submissionID);
@@ -165,5 +200,15 @@ app.put("/submissions", (req,res) => {
     if (err) return res.json({ error: err });
     res.json(result);
     console.log(result);
+  });
+});
+
+//Queries on the courses table
+//SELECT *
+app.get("/courses", (req, res) => {
+  const sqlQuery = "SELECT * FROM Courses;";
+   dbConnection.query(sqlQuery, function (err, result, fields) {
+    if (err) return res.json({ error: err });
+    res.json(result);
   });
 });

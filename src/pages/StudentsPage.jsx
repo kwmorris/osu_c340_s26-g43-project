@@ -1,4 +1,6 @@
-import { useState } from 'react';
+// Citation: All work in this file is our own, AI tools were not used in the generation of this file. 
+
+import { useState, useEffect } from 'react';
 import StudentsTable from '../components/StudentsTable';
 import axios from 'axios';
 
@@ -6,16 +8,14 @@ const HOST = 'classwork.engr.oregonstate.edu';
 const PORT = 13331;
 
 function StudentsPage() {
+    // State variables for the page
     const [students, setStudents] = useState([]);
+    const [deleteStudentID, setDeleteStudentID] = useState('');
 
-    const blankStudent = {
-        studentID: '',
-        email: '',
-        firstName: '',
-        lastName: ''
-    };
-
-    window.onload = (event) => {refreshTable()}
+    // Refresh the table
+    useEffect(() => {
+        setTimeout(refreshTable(), 5000);
+    });
 
     function refreshTable() {
         console.log("Refresh table")
@@ -24,8 +24,7 @@ function StudentsPage() {
             .catch(err => console.log(err));
     };
 
-    const [deleteStudentID, setDeleteStudentID] = useState('');
-
+    // Call the API to remove the entry
     function deleteStudent(e) {
         e.preventDefault();
         console.log("Delete requested for id:", deleteStudentID)
@@ -39,6 +38,7 @@ function StudentsPage() {
         setDeleteStudentID('');
     }
 
+    // Retun HTML components for the page
     return (
         <main>
             <h2>Students</h2>

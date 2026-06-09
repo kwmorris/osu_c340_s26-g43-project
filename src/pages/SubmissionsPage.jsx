@@ -1,4 +1,6 @@
-import { useState } from 'react';
+// Citation: All work in this file is our own, AI tools were not used in the generation of this file. 
+
+import { useState, useEffect } from 'react';
 import SubmissionsTable from '../components/SubmissionsTable';
 import axios from 'axios';
 
@@ -6,11 +8,7 @@ const HOST = 'classwork.engr.oregonstate.edu';
 const PORT = 13331;
 
 function SubmissionsPage() {
-    const [submissions, setSubmissions] = useState([]);
-    const [assignments, setAssignments] = useState([]);
-    const [students, setStudents] = useState([]);
-    const [staff, setStaff] = useState([]);
-
+    // Blank data templates
     const blankSubmission = {
         submissionID: '',
         assignmentID: '',
@@ -30,11 +28,23 @@ function SubmissionsPage() {
         firstName: '',
         lastName: ''
     }
+    
+    // State variables for the page
+    const [submissions, setSubmissions] = useState([]);
+    const [assignments, setAssignments] = useState([]);
+    const [students, setStudents] = useState([]);
+    const [staff, setStaff] = useState([]);
+    const [updateSubmission, setUpdateSubmission] = useState(blankSubmission);
+    const [selectedSubmissionID, setSelectedSubmissionID] = useState('');
 
-    window.onload = (event) => {refreshTables()}
+    // Refresht the tables
+    useEffect(() => {
+        setTimeout(refreshTables(), 5000);
+    });
 
     function refreshTables() {
         refreshSubmissionsTable();
+        // Get data for the input dropdowns
         axios.get(`http://${HOST}:${PORT}/assignments`)
             .then(res => {
                 setAssignments(res.data);
@@ -54,6 +64,7 @@ function SubmissionsPage() {
             .catch(err => console.log(err));
     };
 
+    // Get data for the table on the page
     function refreshSubmissionsTable() {
         console.log("Refresh table")
         axios.get(`http://${HOST}:${PORT}/submissions`)
@@ -63,9 +74,7 @@ function SubmissionsPage() {
             .catch(err => console.log(err));
     };
 
-    const [updateSubmission, setUpdateSubmission] = useState(blankSubmission);
-    const [selectedSubmissionID, setSelectedSubmissionID] = useState('');
-
+    // Parse data to populate the dropdowns
     function getStudentName(studentID) {
         const submission = submissions.find((s) => s.studentID === studentID);
         return submission ? submission.studentName : '';
@@ -83,6 +92,7 @@ function SubmissionsPage() {
         } else { return '' };
     }
 
+    // Update state varible when the inputs change
     function handleUpdateChange(e) {
         const { name, value } = e.target;
 
@@ -118,6 +128,7 @@ function SubmissionsPage() {
         }
     }
 
+    // Update the state variable when the selection changes
     function selectSubmission(e) {
         const id = e.target.value;
         setSelectedSubmissionID(id);
@@ -128,6 +139,7 @@ function SubmissionsPage() {
         }
     }
 
+    // Call the API to update the existing entry
     function updateExistingSubmission(e) {
         e.preventDefault();
         console.log(updateSubmission);
@@ -142,6 +154,7 @@ function SubmissionsPage() {
         setSelectedSubmissionID('');
     }
 
+    // Retun HTML components for the page
     return (
         <main>
             <h2>Submissions</h2>
@@ -161,8 +174,6 @@ function SubmissionsPage() {
                         </option>
                     ))}
                 </select>
-
-                {/* <input name="submissionID" placeholder="Submission ID" value={updateSubmission.submissionID} onChange={handleUpdateChange} /> */}
 
                 <select name="assignmentID" value={updateSubmission.assignmentID} onChange={handleUpdateChange}>
                     <option value="">Select assignment</option>
