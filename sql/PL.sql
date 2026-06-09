@@ -1,14 +1,14 @@
 -- AI tools were not used in the development of this file
 
-DROP PROCEDURE IF EXISTS DeleteSubmission;
+DROP PROCEDURE IF EXISTS DeleteStudent;
 DELIMITER //
 
-CREATE PROCEDURE DeleteSubmission (
+CREATE PROCEDURE DeleteStudent (
 	IN p_deleteID INT
 )
 BEGIN
-    DELETE FROM Submissions
-    WHERE submissionID = p_deleteID;
+    DELETE FROM Students
+    WHERE studentID = p_deleteID;
 END //
 
 DELIMITER ;
