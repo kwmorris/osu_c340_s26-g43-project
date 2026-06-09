@@ -1,6 +1,6 @@
 // Citation: All work in this file is our own, AI tools were not used in the generation of this file. 
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AssignmentsTable from '../components/AssignmentsTable';
 import axios from 'axios';
 
@@ -8,10 +8,6 @@ const HOST = 'classwork.engr.oregonstate.edu';
 const PORT = 13331;
 
 function AssignmentsPage() {
-    // State variables for the page
-    const [assignments, setAssignments] = useState([]);
-    const [newAssignment, setNewAssignment] = useState(blankAssignment);
-
     // Blank data template
     const blankAssignment = {
         assignmentID: '',
@@ -20,11 +16,25 @@ function AssignmentsPage() {
         dueDate: '',
         points: ''
     };
+    
+    // State variables for the page
+    const [assignments, setAssignments] = useState([]);
+    const [courses, setCourses] = useState([]);
+    const [newAssignment, setNewAssignment] = useState(blankAssignment);
 
-    // Get table data on first load
-    window.onload = (event) => {refreshTable()}
+    // Refresht the tables
+    useEffect(() => {
+        setTimeout(refreshTables(), 5000);
+    });
 
-    function refreshTable() {
+    function refreshTables() {
+        refreshAssignmentTable();
+        axios.get(`http://${HOST}:${PORT}/courses`)
+            .then(res => setCourses(res.data))
+            .catch(err => console.log(err));
+    }
+
+    function refreshAssignmentTable() {
         console.log("Refresh table")
         axios.get(`http://${HOST}:${PORT}/assignments`)
             .then(res => setAssignments(res.data))
@@ -37,7 +47,7 @@ function AssignmentsPage() {
         let url = `http://${HOST}:${PORT}/assignments`
         axios.post(url, newAssignment)
             .then(res => {
-                refreshTable()
+                refreshAssignmentTable()
             })
             .catch(err => console.log(err));
         setNewAssignment(blankAssignment);
@@ -58,6 +68,14 @@ function AssignmentsPage() {
 
             <h3>Add Assignment</h3>
             <form onSubmit={addAssignment}>
+                <select name="courseID" value={newAssignment.courseID} onChange={handleNewChange}>
+                    <option value="">Select course</option>
+                    {courses.map((course) => (
+                        <option key={course.courseID} value={course.courseID}>
+                            {course.courseName}
+                        </option>
+                    ))}
+                </select>
                 <input name="name" placeholder="Assignment Name" value={newAssignment.name} onChange={handleNewChange} />
                 <input name="description" placeholder="Description" value={newAssignment.description} onChange={handleNewChange} />
                 <input name="dueDate" placeholder="Due Date" value={newAssignment.dueDate} onChange={handleNewChange} />

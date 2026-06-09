@@ -109,10 +109,21 @@ app.get("/staff", (req, res) => {
   });
 });
 
-//Queries on the assignemtns table
+//Queries on the assignments table
 //SELECT *
 app.get("/assignments", (req, res) => {
-  const sqlQuery = "SELECT * FROM Assignments;";
+  const sqlQuery = `SELECT
+      Assignments.assignmentID,
+      Assignments.courseID,
+      Courses.courseCode,
+      Courses.courseName,
+      Assignments.name,
+      Assignments.description,
+      Assignments.dueDate,
+      Assignments.points
+    FROM Assignments
+    INNER JOIN Courses
+    ON Assignments.courseID = Courses.courseID;`;
    dbConnection.query(sqlQuery, function (err, result, fields) {
     if (err) return res.json({ error: err });
     res.json(result);
@@ -123,11 +134,12 @@ app.get("/assignments", (req, res) => {
 app.post("/assignments", (req, res) => {
   console.log("Create assignment requested.")
   console.log(req.body)
+  const courseID = req.body.courseID;
   const assignmentName = req.body.name;
   const assignmentDescription = req.body.description;
   const assignmentDueDate = req.body.dueDate;
   const assignmentPoints = req.body.points;
-  const callProcedure = `CALL CreateAssignment ("${assignmentName}", "${assignmentDescription}", "${assignmentDueDate}", ${assignmentPoints});;`
+  const callProcedure = `CALL CreateAssignment (${courseID}, "${assignmentName}", "${assignmentDescription}", "${assignmentDueDate}", ${assignmentPoints});;`
   console.log(callProcedure)
   dbConnection.query(callProcedure, function (err, result, fields) {
     if (err) return res.json({ error: err });
@@ -188,5 +200,15 @@ app.put("/submissions", (req,res) => {
     if (err) return res.json({ error: err });
     res.json(result);
     console.log(result);
+  });
+});
+
+//Queries on the courses table
+//SELECT *
+app.get("/courses", (req, res) => {
+  const sqlQuery = "SELECT * FROM Courses;";
+   dbConnection.query(sqlQuery, function (err, result, fields) {
+    if (err) return res.json({ error: err });
+    res.json(result);
   });
 });

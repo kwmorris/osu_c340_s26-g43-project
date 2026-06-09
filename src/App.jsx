@@ -1,3 +1,5 @@
+// Citation: All work in this file is our own, AI tools were not used in the generation of this file. 
+
 import './App.css'
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import Navigation from './components/Navigation';
@@ -6,6 +8,7 @@ import AssignmentsPage from './pages/AssignmentsPage';
 import StudentsPage from './pages/StudentsPage';
 import SubmissionsPage from './pages/SubmissionsPage';
 import StaffPage from './pages/StaffPage';
+import CoursesPage from './pages/CoursesPage';
 
 function App() {
 
@@ -19,6 +22,7 @@ function App() {
           <Route path="/students" element={ <StudentsPage />}></Route>
           <Route path="/submissions" element={ <SubmissionsPage />}></Route>
           <Route path="/staff" element={ <StaffPage />}></Route>
+          <Route path="/courses" element={ <CoursesPage />}></Route>
          </Routes>
       </Router>
     </div>
