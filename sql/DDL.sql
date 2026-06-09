@@ -1,3 +1,5 @@
+-- AI tools were not used in the development of this file
+
 DROP PROCEDURE IF EXISTS ResetAssignmentTrackerDB;
 DELIMITER //
 
