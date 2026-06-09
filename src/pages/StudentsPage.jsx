@@ -1,11 +1,8 @@
 import { useState } from 'react';
-// import studentsData from '../data/students';
 import StudentsTable from '../components/StudentsTable';
 import axios from 'axios';
-// import { response } from 'express';
 
-// const HOST = 'classwork.engr.oregonstate.edu';
-const HOST = 'localhost';
+const HOST = 'classwork.engr.oregonstate.edu';
 const PORT = 13331;
 
 function StudentsPage() {
