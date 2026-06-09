@@ -1,8 +1,3 @@
-// import students from '../data/students';
-// import assignments from '../data/assignments';
-// import submissions from '../data/submissions';
-// import staff from '../data/staff';
-
 import StudentsTable from '../components/StudentsTable';
 import AssignmentsTable from '../components/AssignmentsTable';
 import SubmissionsTable from '../components/SubmissionsTable';
@@ -18,9 +13,8 @@ function HomePage() {
     const [assignments, setAssignments] = useState([]);
     const [submissions, setSubmissions] = useState([]);
     
-    useEffect(() => {
-        refreshTables();
-    });
+
+    window.onload = (event) => {refreshTables()}
 
     function refreshTables() {
         getStudents();

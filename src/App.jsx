@@ -1,9 +1,5 @@
 import './App.css'
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
-import assignments from './data/assignments';
-import students from './data/students';
-import submissions from './data/submissions';
-import staff from './data/staff';
 import Navigation from './components/Navigation';
 import HomePage from './pages/HomePage';
 import AssignmentsPage from './pages/AssignmentsPage';
@@ -18,11 +14,11 @@ function App() {
       <Router>
         <Navigation />
         <Routes>
-          <Route path="/" element={ <HomePage assignments={assignments} students={students} submissions={submissions} staff={staff}  />}></Route>
-          <Route path="/assignments" element={ <AssignmentsPage assignments={assignments} />}></Route>
-          <Route path="/students" element={ <StudentsPage students={students} />}></Route>
-          <Route path="/submissions" element={ <SubmissionsPage submissions={submissions} />}></Route>
-          <Route path="/staff" element={ <StaffPage staff={staff} />}></Route>
+          <Route path="/" element={ <HomePage />}></Route>
+          <Route path="/assignments" element={ <AssignmentsPage />}></Route>
+          <Route path="/students" element={ <StudentsPage />}></Route>
+          <Route path="/submissions" element={ <SubmissionsPage />}></Route>
+          <Route path="/staff" element={ <StaffPage />}></Route>
          </Routes>
       </Router>
     </div>

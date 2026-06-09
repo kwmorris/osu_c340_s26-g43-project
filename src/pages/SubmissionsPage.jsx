@@ -1,13 +1,8 @@
 import { useState } from 'react';
-// import submissionsData from '../data/submissions';
-// import studentsData from '../data/students';
-// import assignmentsData from '../data/assignments';
-// import staffData from '../data/staff';
 import SubmissionsTable from '../components/SubmissionsTable';
 import axios from 'axios';
 
-// const HOST = 'classwork.engr.oregonstate.edu';
-const HOST = 'localhost';
+const HOST = 'classwork.engr.oregonstate.edu';
 const PORT = 13331;
 
 function SubmissionsPage() {
@@ -43,13 +38,11 @@ function SubmissionsPage() {
         axios.get(`http://${HOST}:${PORT}/assignments`)
             .then(res => {
                 setAssignments(res.data);
-                // console.log(res.data);
             })
             .catch(err => console.log(err));
         axios.get(`http://${HOST}:${PORT}/students`)
             .then(res => {
                 setStudents(res.data);
-                // console.log(res.data);
             })
             .catch(err => console.log(err));
         axios.get(`http://${HOST}:${PORT}/staff`)
@@ -57,7 +50,6 @@ function SubmissionsPage() {
                 var staff = res.data;
                 staff.unshift(blankStaff)
                 setStaff(staff);
-                // console.log(staff);
             })
             .catch(err => console.log(err));
     };
@@ -67,15 +59,12 @@ function SubmissionsPage() {
         axios.get(`http://${HOST}:${PORT}/submissions`)
             .then(res => {
                 setSubmissions(res.data);
-                // console.log(res.data);
             })
             .catch(err => console.log(err));
     };
 
-    // const [newSubmission, setNewSubmission] = useState(blankSubmission);
     const [updateSubmission, setUpdateSubmission] = useState(blankSubmission);
     const [selectedSubmissionID, setSelectedSubmissionID] = useState('');
-    // const [deleteSubmissionID, setDeleteSubmissionID] = useState('');
 
     function getStudentName(studentID) {
         const submission = submissions.find((s) => s.studentID === studentID);
@@ -93,32 +82,6 @@ function SubmissionsPage() {
         return submission ? submission.staffName : '';
         } else { return '' };
     }
-
-    // function handleNewChange(e) {
-    //     const { name, value } = e.target;
-
-    //     if (name === 'studentID') {
-    //         setNewSubmission({
-    //             ...newSubmission,
-    //             studentID: value,
-    //             studentName: getStudentName(value)
-    //         });
-    //     } else if (name === 'assignmentID') {
-    //         setNewSubmission({
-    //             ...newSubmission,
-    //             assignmentID: value,
-    //             assignmentName: getAssignmentName(value)
-    //         });
-    //     } else if (name === 'staffID') {
-    //         setNewSubmission({
-    //             ...newSubmission,
-    //             staffID: value,
-    //             staffName: getStaffName(value)
-    //         });
-    //     } else {
-    //         setNewSubmission({ ...newSubmission, [name]: value });
-    //     }
-    // }
 
     function handleUpdateChange(e) {
         const { name, value } = e.target;
@@ -155,12 +118,6 @@ function SubmissionsPage() {
         }
     }
 
-    // function addSubmission(e) {
-    //     e.preventDefault();
-    //     setSubmissions([...submissions, newSubmission]);
-    //     setNewSubmission(blankSubmission);
-    // }
-
     function selectSubmission(e) {
         const id = e.target.value;
         setSelectedSubmissionID(id);
@@ -183,28 +140,7 @@ function SubmissionsPage() {
             .catch(err => console.log(err));
         setUpdateSubmission(blankSubmission);
         setSelectedSubmissionID('');
-
-
-        // setSubmissions(
-        //     submissions.map((submission) =>
-        //         submission.submissionID.toString() === selectedSubmissionID
-        //             ? updateSubmission
-        //             : submission
-        //     )
-        // );
     }
-
-    // function deleteSubmission(e) {
-    //     e.preventDefault();
-
-    //     setSubmissions(
-    //         submissions.filter(
-    //             (submission) => submission.submissionID.toString() !== deleteSubmissionID
-    //         )
-    //     );
-
-    //     setDeleteSubmissionID('');
-    // }
 
     return (
         <main>
@@ -214,48 +150,6 @@ function SubmissionsPage() {
             <SubmissionsTable submissions={submissions} />
 
             <hr />
-
-            {/* <h3>Add Submission</h3>
-            <form onSubmit={addSubmission}>
-                <input name="submissionID" placeholder="Submission ID" value={newSubmission.submissionID} onChange={handleNewChange} />
-
-                <select name="assignmentID" value={newSubmission.assignmentID} onChange={handleNewChange}>
-                    <option value="">Select assignment</option>
-                    {assignmentsData.map((assignment) => (
-                        <option key={assignment.assignmentID} value={assignment.assignmentID}>
-                            {assignment.name}
-                        </option>
-                    ))}
-                </select>
-
-                <select name="studentID" value={newSubmission.studentID} onChange={handleNewChange}>
-                    <option value="">Select student</option>
-                    {studentsData.map((student) => (
-                        <option key={student.studentID} value={student.studentID}>
-                            {student.email} - {student.firstName} {student.lastName}
-                        </option>
-                    ))}
-                </select>
-
-                <input name="submissionDate" placeholder="Submission Date" value={newSubmission.submissionDate} onChange={handleNewChange} />
-                <input name="submissionNotes" placeholder="Submission Notes" value={newSubmission.submissionNotes} onChange={handleNewChange} />
-
-                <select name="staffID" value={newSubmission.staffID} onChange={handleNewChange}>
-                    <option value="">Select grader</option>
-                    {staffData.map((staffMember) => (
-                        <option key={staffMember.staffID} value={staffMember.staffID}>
-                            {staffMember.firstName} {staffMember.lastName}
-                        </option>
-                    ))}
-                </select>
-
-                <input name="grade" placeholder="Grade" value={newSubmission.grade} onChange={handleNewChange} />
-                <input name="graderNotes" placeholder="Grader Notes" value={newSubmission.graderNotes} onChange={handleNewChange} />
-
-                <button type="submit">Add Submission</button>
-            </form>
-
-            <hr /> */}
 
             <h3>Update Submission</h3>
             <form onSubmit={updateExistingSubmission}>
@@ -305,22 +199,6 @@ function SubmissionsPage() {
 
                 <button type="submit">Update Submission</button>
             </form>
-
-            {/* <hr />
-
-            <h3>Delete Submission</h3>
-            <form onSubmit={deleteSubmission}>
-                <select value={deleteSubmissionID} onChange={(e) => setDeleteSubmissionID(e.target.value)}>
-                    <option value="">Select submission</option>
-                    {submissions.map((submission) => (
-                        <option key={submission.submissionID} value={submission.submissionID}>
-                            #{submission.submissionID} - {submission.studentName} / {submission.assignmentName}
-                        </option>
-                    ))}
-                </select>
-
-                <button type="submit">Delete Submission</button>
-            </form> */}
         </main>
     );
 }
