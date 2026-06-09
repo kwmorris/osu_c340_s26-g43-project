@@ -1,3 +1,5 @@
+// Citation: All work in this file is our own, AI tools were not used in the generation of this file. 
+
 import SubmissionRow from "./SubmissionRow";
 
 function SubmissionTable ({ submissions }) {

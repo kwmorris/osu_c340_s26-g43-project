@@ -1,3 +1,5 @@
+// Citation: All work in this file is our own, AI tools were not used in the generation of this file. 
+
 import { useState } from 'react';
 import AssignmentsTable from '../components/AssignmentsTable';
 import axios from 'axios';
@@ -6,8 +8,11 @@ const HOST = 'classwork.engr.oregonstate.edu';
 const PORT = 13331;
 
 function AssignmentsPage() {
+    // State variables for the page
     const [assignments, setAssignments] = useState([]);
+    const [newAssignment, setNewAssignment] = useState(blankAssignment);
 
+    // Blank data template
     const blankAssignment = {
         assignmentID: '',
         name: '',
@@ -16,6 +21,7 @@ function AssignmentsPage() {
         points: ''
     };
 
+    // Get table data on first load
     window.onload = (event) => {refreshTable()}
 
     function refreshTable() {
@@ -25,12 +31,7 @@ function AssignmentsPage() {
             .catch(err => console.log(err));
     };
 
-    const [newAssignment, setNewAssignment] = useState(blankAssignment);
-
-    function handleNewChange(e) {
-        setNewAssignment({ ...newAssignment, [e.target.name]: e.target.value });
-    }
-
+    // Call the API to add a new entry
     function addAssignment(e) {
         e.preventDefault();
         let url = `http://${HOST}:${PORT}/assignments`
@@ -42,6 +43,12 @@ function AssignmentsPage() {
         setNewAssignment(blankAssignment);
     }
 
+    // Update state varible when the inputs change
+    function handleNewChange(e) {
+        setNewAssignment({ ...newAssignment, [e.target.name]: e.target.value });
+    }
+
+    // Retun HTML components for the page
     return (
         <main>
             <h2>Assignments</h2>
