@@ -1,3 +1,14 @@
+/* Citations:
+  Citation for the 'handleDisconnect' function: 
+  Date: 08JUN2026
+  Adapted from Stack Overflow
+  The function and error handling code from the source have been adapated to target a different error
+    and provide additional logs.
+  Source URL: https://stackoverflow.com/questions/37385833/node-js-mysql-database-disconnect
+  if AI tools were used
+    No AI tools were used in generating this code.
+*/
+
 import express from 'express';
 import cors from 'cors';
 import mysql from 'mysql';
@@ -24,6 +35,7 @@ var dbConfig = {
 
 var dbConnection;
 function handleDisconnect() {
+  // Prepares a connection to the mySQL DB
   dbConnection = mysql.createConnection(dbConfig);
   dbConnection.connect( function onConnect(err) {
     if (err) {
@@ -44,11 +56,10 @@ function handleDisconnect() {
 }
 handleDisconnect();
 
-
 app.get("/reset", (req, res) => {
   console.log("Reset requested")
   const sqlQuery = "CALL ResetAssignmentTrackerDB;"
-   con.query(sqlQuery, function (err, result, fields) {
+   dbConnection.query(sqlQuery, function (err, result, fields) {
     if (err) throw err;
     console.log(result);
   });
@@ -56,15 +67,26 @@ app.get("/reset", (req, res) => {
 
 app.get("/students", (req, res) => {
   const sqlQuery = "SELECT * FROM Students;"
-   con.query(sqlQuery, function (err, result, fields) {
+   dbConnection.query(sqlQuery, function (err, result, fields) {
     if (err) return res.json({ error: err });
     res.json(result);
   });
 });
 
+app.delete("/students/:deleteID", (req, res) => {
+  const deleteID = req.params.deleteID;
+  console.log("Delete request for student:", deleteID);
+  const sqlQuery = `CALL DeleteStudent(${deleteID})`;
+  dbConnection.query(sqlQuery, function (err, result, fields) {
+    if (err) return res.json({ error: err });
+    res.json(result);
+    console.log(result);
+  });
+});
+
 app.get("/staff", (req, res) => {
   const sqlQuery = "SELECT * FROM Staff;"
-   con.query(sqlQuery, function (err, result, fields) {
+   dbConnection.query(sqlQuery, function (err, result, fields) {
     if (err) return res.json({ error: err });
     res.json(result);
   });
@@ -72,7 +94,7 @@ app.get("/staff", (req, res) => {
 
 app.get("/assignments", (req, res) => {
   const sqlQuery = "SELECT * FROM Assignments;";
-   con.query(sqlQuery, function (err, result, fields) {
+   dbConnection.query(sqlQuery, function (err, result, fields) {
     if (err) return res.json({ error: err });
     res.json(result);
   });
@@ -87,7 +109,7 @@ app.post("/assignments", (req, res) => {
   const assignmentPoints = req.body.points;
   const callProcedure = `CALL CreateAssignment ("${assignmentName}", "${assignmentDescription}", "${assignmentDueDate}", ${assignmentPoints});;`
   console.log(callProcedure)
-  con.query(callProcedure, function (err, result, fields) {
+  dbConnection.query(callProcedure, function (err, result, fields) {
     if (err) return res.json({ error: err });
     res.json(result);
     console.log(result);
@@ -112,7 +134,7 @@ app.get("/submissions", (req, res) => {
     LEFT JOIN Assignments ON Submissions.assignmentID = Assignments.assignmentID
     LEFT JOIN Students ON Submissions.studentID = Students.studentID
     LEFT JOIN Staff ON Submissions.staffID = Staff.staffID;`;
-   con.query(sqlQuery, function (err, result, fields) {
+   dbConnection.query(sqlQuery, function (err, result, fields) {
     if (err) return res.json({ error: err });
     res.json(result);
   });
@@ -122,7 +144,7 @@ app.get("/remove/submissions/:id", (req, res) => {
   const submissionID = parseInt(req.params.id);
   console.log(`Delete request for Submisison ${submissionID}`)
   const sqlQuery = `CALL DeleteSubmission(${submissionID})`
-  con.query(sqlQuery, function (err, result, fields) {
+  dbConnection.query(sqlQuery, function (err, result, fields) {
     if (err) return res.json({ error: err });
     res.json(result);
     console.log(result);

@@ -13,7 +13,6 @@ function SubmissionTable ({ submissions }) {
                     <th>Grader Name</th>
                     <th>Grade</th>
                     <th>Grader Notes</th>
-                    <th>Delete?</th>
                 </tr>
             </thead>
             <tbody>

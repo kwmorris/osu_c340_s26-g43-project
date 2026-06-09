@@ -12,7 +12,6 @@ function SubmissionRow ({ submission }) {
             <td>{submission.staffName}</td>
             <td>{submission.grade}</td>
             <td>{submission.graderNotes}</td>
-            <td><DeleteButton table = { 'submissions' } id = { submission.submissionID } /></td>
         </tr>
     );
 }
