@@ -127,7 +127,7 @@ app.get("/submissions", (req, res) => {
         Submissions.submissionDate,
         Submissions.submissionNotes,
         Submissions.staffID,
-        CONCAT(Staff.firstName, ' ', Staff.lastName) AS graderName,
+        CONCAT(Staff.firstName, ' ', Staff.lastName) AS staffName,
         Submissions.grade,
         Submissions.graderNotes
     FROM Submissions
@@ -140,10 +140,27 @@ app.get("/submissions", (req, res) => {
   });
 });
 
-app.get("/remove/submissions/:id", (req, res) => {
-  const submissionID = parseInt(req.params.id);
-  console.log(`Delete request for Submisison ${submissionID}`)
-  const sqlQuery = `CALL DeleteSubmission(${submissionID})`
+app.put("/submissions", (req,res) => {
+  console.log(req.body);
+  const submissionID = parseInt(req.body.submissionID);
+  const assignmentID = parseInt(req.body.assignmentID);
+  const studentID = `"${req.body.studentID}"`;
+  const submissionDate = `"${req.body.submissionDate}"`;
+  const submissionNotes = `"${req.body.submissionNotes}"`;
+  const staffID = req.body.staffID != "" ? `"${req.body.staffID}"` : null;
+  const grade = parseFloat(req.body.grade) == parseFloat(req.body.grade) ? parseFloat(req.body.grade) : null;
+  const graderNotes = `"${req.body.graderNotes}"`;
+  const sqlQuery = `CALL UpdateSubmission(
+        ${submissionID},
+        ${assignmentID},
+        ${studentID},
+        ${submissionDate},
+        ${submissionNotes},
+        ${staffID},
+        ${grade},
+        ${graderNotes}
+        );`
+  console.log(sqlQuery);
   dbConnection.query(sqlQuery, function (err, result, fields) {
     if (err) return res.json({ error: err });
     res.json(result);
