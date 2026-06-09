@@ -4,7 +4,7 @@ DROP PROCEDURE IF EXISTS DeleteStudent;
 DELIMITER //
 
 CREATE PROCEDURE DeleteStudent (
-	IN p_deleteID INT
+	IN p_deleteID VARCHAR(50)
 )
 BEGIN
     DELETE FROM Students
@@ -46,6 +46,7 @@ DROP PROCEDURE IF EXISTS CreateAssignment;
 DELIMITER //
 
 CREATE PROCEDURE CreateAssignment (
+	IN p_courseID INT,
     IN p_name VARCHAR(255),
     IN p_description VARCHAR(1000),
     IN p_dueDate timestamp,
@@ -53,11 +54,13 @@ CREATE PROCEDURE CreateAssignment (
 )
 BEGIN
     INSERT INTO Assignments (
+		courseID,
         name,
         description,
         dueDate,
         points
     ) VALUES (
+		p_courseID,
         p_name,
         p_description,
         p_dueDate,
