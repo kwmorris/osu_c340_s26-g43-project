@@ -7,6 +7,7 @@ BEGIN
 
     DROP TABLE IF EXISTS Submissions;
     DROP TABLE IF EXISTS Assignments;
+    DROP TABLE IF EXISTS Courses;
     DROP TABLE IF EXISTS Staff;
     DROP TABLE IF EXISTS Students;
 
@@ -24,12 +25,21 @@ BEGIN
         lastName varchar(255) NOT NULL
     );
 
+    CREATE TABLE Courses (
+        courseID int AUTO_INCREMENT PRIMARY KEY,
+        courseName varchar(255) NOT NULL,
+        courseCode varchar(50) UNIQUE NOT NULL,
+        term varchar(50) NOT NULL
+    );
+
     CREATE TABLE Assignments (
         assignmentID int AUTO_INCREMENT PRIMARY KEY,
+        courseID int NOT NULL,
         name varchar(255) NOT NULL,
         description varchar(1000) NOT NULL,
         dueDate timestamp NOT NULL,
-        points int NOT NULL
+        points int NOT NULL,
+        FOREIGN KEY (courseID) REFERENCES Courses(courseID) ON DELETE CASCADE ON UPDATE CASCADE
     );
 
     CREATE TABLE Submissions (
@@ -41,7 +51,7 @@ BEGIN
         staffID varchar(50),
         grade decimal(6,2),
         graderNotes varchar(100),
-        FOREIGN KEY (assignmentID) REFERENCES Assignments(assignmentID) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (assignmentID) REFERENCES Assignments(assignmentID) ON DELETE RESTRICT ON UPDATE CASCADE,
         FOREIGN KEY (studentID) REFERENCES Students(studentID) ON DELETE CASCADE ON UPDATE CASCADE,
         FOREIGN KEY (staffID) REFERENCES Staff(staffID) ON DELETE SET NULL ON UPDATE CASCADE
     );
@@ -57,13 +67,20 @@ BEGIN
     INSERT INTO Staff (staffID, email, firstName, lastName)
     VALUES
     ('0994884', 'parker.smith@sterra.edu', 'Parker', 'Smith'),
-    ('0994815', 'jordan.lee@sterra.edu', 'Jordan', 'Lee');
+    ('0994815', 'jordan.lee@sterra.edu', 'Jordan', 'Lee'),
+    ('0994772', 'taylor.brooks@sterra.edu', 'Taylor', 'Brooks');
 
-    INSERT INTO Assignments (assignmentID, name, description, dueDate, points)
+    INSERT INTO Courses (courseID, courseName, courseCode, term)
     VALUES
-    (15, 'Coleridge Essay', 'Write a five-page analysis on Coleridge', '2026-04-10 23:59:00', 100),
-    (172, 'Algebra 2 Exam', 'Covers weeks 1-6', '2026-04-20 23:59:00', 100),
-    (8, 'Chemistry Lab Report', 'Due Monday, partnered', '2026-05-05 23:59:00', 150);
+    (1, 'Introduction to Databases', 'CS340', 'Spring 2026'),
+    (2, 'General Chemistry', 'CH201', 'Spring 2026'),
+    (3, 'College Algebra', 'MTH111', 'Spring 2026');
+
+    INSERT INTO Assignments (assignmentID, courseID, name, description, dueDate, points)
+    VALUES
+    (15, (SELECT courseID FROM Courses WHERE courseCode = 'CS340'), 'Coleridge Essay', 'Write a five-page analysis on Coleridge', '2026-04-10       23:59:00', 100),
+    (172, (SELECT courseID FROM Courses WHERE courseCode = 'MTH111'), 'Algebra 2 Exam', 'Covers weeks 1-6', '2026-04-20 23:59:00', 100),
+    (8, (SELECT courseID FROM Courses WHERE courseCode = 'CH201'), 'Chemistry Lab Report', 'Due Monday, partnered', '2026-05-05 23:59:00', 150);
 
     INSERT INTO Submissions (
         submissionID,
