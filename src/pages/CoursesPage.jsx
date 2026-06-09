@@ -11,13 +11,20 @@ function CoursesPage() {
     // State variable fo the page
     const [courses, setCourses] = useState([]);
 
-    // Refresh the table
+    // Refresh the tables
     useEffect(() => {
-        setTimeout(refreshTable(), 5000);
-    });
+        refreshTable();
+
+        const interval = setInterval(refreshTable, 5000);
+
+        return() => {
+            console.log("Clear Interval")
+            clearInterval(interval);
+        }
+    }, []);
 
     function refreshTable() {
-        console.log("Refresh table")
+        console.log("Refresh Courses table")
         axios.get(`http://${HOST}:${PORT}/courses`)
             .then(res => setCourses(res.data))
             .catch(err => console.log(err));

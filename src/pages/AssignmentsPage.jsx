@@ -22,10 +22,17 @@ function AssignmentsPage() {
     const [courses, setCourses] = useState([]);
     const [newAssignment, setNewAssignment] = useState(blankAssignment);
 
-    // Refresht the tables
+    // Refresh the tables
     useEffect(() => {
-        setTimeout(refreshTables(), 5000);
-    });
+        refreshTables();
+
+        const interval = setInterval(refreshTables, 5000);
+
+        return() => {
+            console.log("Clear Interval")
+            clearInterval(interval);
+        }
+    }, []);
 
     function refreshTables() {
         refreshAssignmentTable();
@@ -35,7 +42,7 @@ function AssignmentsPage() {
     }
 
     function refreshAssignmentTable() {
-        console.log("Refresh table")
+        console.log("Refresh Assignment table")
         axios.get(`http://${HOST}:${PORT}/assignments`)
             .then(res => setAssignments(res.data))
             .catch(err => console.log(err));
