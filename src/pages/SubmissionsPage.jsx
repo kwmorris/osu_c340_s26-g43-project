@@ -1,12 +1,20 @@
 import { useState } from 'react';
-import submissionsData from '../data/submissions';
-import studentsData from '../data/students';
-import assignmentsData from '../data/assignments';
-import staffData from '../data/staff';
+// import submissionsData from '../data/submissions';
+// import studentsData from '../data/students';
+// import assignmentsData from '../data/assignments';
+// import staffData from '../data/staff';
 import SubmissionsTable from '../components/SubmissionsTable';
+import axios from 'axios';
+
+// const HOST = 'classwork.engr.oregonstate.edu';
+const HOST = 'localhost';
+const PORT = 13331;
 
 function SubmissionsPage() {
-    const [submissions, setSubmissions] = useState(submissionsData);
+    const [submissions, setSubmissions] = useState([]);
+    const [assignments, setAssignments] = useState([]);
+    const [students, setStudents] = useState([]);
+    const [staff, setStaff] = useState([]);
 
     const blankSubmission = {
         submissionID: '',
@@ -22,51 +30,95 @@ function SubmissionsPage() {
         graderNotes: ''
     };
 
-    const [newSubmission, setNewSubmission] = useState(blankSubmission);
+    const blankStaff = {
+        staffID: '',
+        firstName: '',
+        lastName: ''
+    }
+
+    window.onload = (event) => {refreshTables()}
+
+    function refreshTables() {
+        refreshSubmissionsTable();
+        axios.get(`http://${HOST}:${PORT}/assignments`)
+            .then(res => {
+                setAssignments(res.data);
+                // console.log(res.data);
+            })
+            .catch(err => console.log(err));
+        axios.get(`http://${HOST}:${PORT}/students`)
+            .then(res => {
+                setStudents(res.data);
+                // console.log(res.data);
+            })
+            .catch(err => console.log(err));
+        axios.get(`http://${HOST}:${PORT}/staff`)
+            .then(res => {
+                var staff = res.data;
+                staff.unshift(blankStaff)
+                setStaff(staff);
+                // console.log(staff);
+            })
+            .catch(err => console.log(err));
+    };
+
+    function refreshSubmissionsTable() {
+        console.log("Refresh table")
+        axios.get(`http://${HOST}:${PORT}/submissions`)
+            .then(res => {
+                setSubmissions(res.data);
+                // console.log(res.data);
+            })
+            .catch(err => console.log(err));
+    };
+
+    // const [newSubmission, setNewSubmission] = useState(blankSubmission);
     const [updateSubmission, setUpdateSubmission] = useState(blankSubmission);
     const [selectedSubmissionID, setSelectedSubmissionID] = useState('');
-    const [deleteSubmissionID, setDeleteSubmissionID] = useState('');
+    // const [deleteSubmissionID, setDeleteSubmissionID] = useState('');
 
     function getStudentName(studentID) {
-        const student = studentsData.find((s) => s.studentID === studentID);
-        return student ? `${student.firstName} ${student.lastName}` : '';
+        const submission = submissions.find((s) => s.studentID === studentID);
+        return submission ? submission.studentName : '';
     }
 
     function getAssignmentName(assignmentID) {
-        const assignment = assignmentsData.find((a) => a.assignmentID.toString() === assignmentID.toString());
-        return assignment ? assignment.name : '';
+        const submission = submissions.find((s) => s.assignmentID.toString() === assignmentID.toString());
+        return submission ? submission.assignmentName : '';
     }
 
     function getStaffName(staffID) {
-        const staffMember = staffData.find((s) => s.staffID === staffID);
-        return staffMember ? `${staffMember.firstName} ${staffMember.lastName}` : '';
+        if (staffID != '') {
+        const submission = submissions.find((s) => s.staffID === staffID);
+        return submission ? submission.staffName : '';
+        } else { return '' };
     }
 
-    function handleNewChange(e) {
-        const { name, value } = e.target;
+    // function handleNewChange(e) {
+    //     const { name, value } = e.target;
 
-        if (name === 'studentID') {
-            setNewSubmission({
-                ...newSubmission,
-                studentID: value,
-                studentName: getStudentName(value)
-            });
-        } else if (name === 'assignmentID') {
-            setNewSubmission({
-                ...newSubmission,
-                assignmentID: value,
-                assignmentName: getAssignmentName(value)
-            });
-        } else if (name === 'staffID') {
-            setNewSubmission({
-                ...newSubmission,
-                staffID: value,
-                staffName: getStaffName(value)
-            });
-        } else {
-            setNewSubmission({ ...newSubmission, [name]: value });
-        }
-    }
+    //     if (name === 'studentID') {
+    //         setNewSubmission({
+    //             ...newSubmission,
+    //             studentID: value,
+    //             studentName: getStudentName(value)
+    //         });
+    //     } else if (name === 'assignmentID') {
+    //         setNewSubmission({
+    //             ...newSubmission,
+    //             assignmentID: value,
+    //             assignmentName: getAssignmentName(value)
+    //         });
+    //     } else if (name === 'staffID') {
+    //         setNewSubmission({
+    //             ...newSubmission,
+    //             staffID: value,
+    //             staffName: getStaffName(value)
+    //         });
+    //     } else {
+    //         setNewSubmission({ ...newSubmission, [name]: value });
+    //     }
+    // }
 
     function handleUpdateChange(e) {
         const { name, value } = e.target;
@@ -84,21 +136,30 @@ function SubmissionsPage() {
                 assignmentName: getAssignmentName(value)
             });
         } else if (name === 'staffID') {
-            setUpdateSubmission({
+            var updateData = {
                 ...updateSubmission,
                 staffID: value,
                 staffName: getStaffName(value)
-            });
+            }
+            if (value === '') {
+                updateData = {
+                ...updateData,
+                grade: '',
+                graderNotes: ''
+                };
+            }
+            setUpdateSubmission(updateData);
+            
         } else {
             setUpdateSubmission({ ...updateSubmission, [name]: value });
         }
     }
 
-    function addSubmission(e) {
-        e.preventDefault();
-        setSubmissions([...submissions, newSubmission]);
-        setNewSubmission(blankSubmission);
-    }
+    // function addSubmission(e) {
+    //     e.preventDefault();
+    //     setSubmissions([...submissions, newSubmission]);
+    //     setNewSubmission(blankSubmission);
+    // }
 
     function selectSubmission(e) {
         const id = e.target.value;
@@ -112,27 +173,38 @@ function SubmissionsPage() {
 
     function updateExistingSubmission(e) {
         e.preventDefault();
+        console.log(updateSubmission);
 
-        setSubmissions(
-            submissions.map((submission) =>
-                submission.submissionID.toString() === selectedSubmissionID
-                    ? updateSubmission
-                    : submission
-            )
-        );
+        axios.put(`http://${HOST}:${PORT}/submissions`, updateSubmission)
+            .then(res => {
+                console.log("Put response:", res)
+                refreshSubmissionsTable()
+            })
+            .catch(err => console.log(err));
+        setUpdateSubmission(blankSubmission);
+        setSelectedSubmissionID('');
+
+
+        // setSubmissions(
+        //     submissions.map((submission) =>
+        //         submission.submissionID.toString() === selectedSubmissionID
+        //             ? updateSubmission
+        //             : submission
+        //     )
+        // );
     }
 
-    function deleteSubmission(e) {
-        e.preventDefault();
+    // function deleteSubmission(e) {
+    //     e.preventDefault();
 
-        setSubmissions(
-            submissions.filter(
-                (submission) => submission.submissionID.toString() !== deleteSubmissionID
-            )
-        );
+    //     setSubmissions(
+    //         submissions.filter(
+    //             (submission) => submission.submissionID.toString() !== deleteSubmissionID
+    //         )
+    //     );
 
-        setDeleteSubmissionID('');
-    }
+    //     setDeleteSubmissionID('');
+    // }
 
     return (
         <main>
@@ -143,7 +215,7 @@ function SubmissionsPage() {
 
             <hr />
 
-            <h3>Add Submission</h3>
+            {/* <h3>Add Submission</h3>
             <form onSubmit={addSubmission}>
                 <input name="submissionID" placeholder="Submission ID" value={newSubmission.submissionID} onChange={handleNewChange} />
 
@@ -183,7 +255,7 @@ function SubmissionsPage() {
                 <button type="submit">Add Submission</button>
             </form>
 
-            <hr />
+            <hr /> */}
 
             <h3>Update Submission</h3>
             <form onSubmit={updateExistingSubmission}>
@@ -196,11 +268,11 @@ function SubmissionsPage() {
                     ))}
                 </select>
 
-                <input name="submissionID" placeholder="Submission ID" value={updateSubmission.submissionID} onChange={handleUpdateChange} />
+                {/* <input name="submissionID" placeholder="Submission ID" value={updateSubmission.submissionID} onChange={handleUpdateChange} /> */}
 
                 <select name="assignmentID" value={updateSubmission.assignmentID} onChange={handleUpdateChange}>
                     <option value="">Select assignment</option>
-                    {assignmentsData.map((assignment) => (
+                    {assignments.map((assignment) => (
                         <option key={assignment.assignmentID} value={assignment.assignmentID}>
                             {assignment.name}
                         </option>
@@ -209,7 +281,7 @@ function SubmissionsPage() {
 
                 <select name="studentID" value={updateSubmission.studentID} onChange={handleUpdateChange}>
                     <option value="">Select student</option>
-                    {studentsData.map((student) => (
+                    {students.map((student) => (
                         <option key={student.studentID} value={student.studentID}>
                             {student.email} - {student.firstName} {student.lastName}
                         </option>
@@ -219,22 +291,22 @@ function SubmissionsPage() {
                 <input name="submissionDate" placeholder="Submission Date" value={updateSubmission.submissionDate} onChange={handleUpdateChange} />
                 <input name="submissionNotes" placeholder="Submission Notes" value={updateSubmission.submissionNotes} onChange={handleUpdateChange} />
 
-                <select name="staffID" value={updateSubmission.staffID} onChange={handleUpdateChange}>
+                <select name="staffID" value={updateSubmission.staffID ?? ''} onChange={handleUpdateChange}>
                     <option value="">Select grader</option>
-                    {staffData.map((staffMember) => (
+                    {staff.map((staffMember) => (
                         <option key={staffMember.staffID} value={staffMember.staffID}>
                             {staffMember.firstName} {staffMember.lastName}
                         </option>
                     ))}
                 </select>
 
-                <input name="grade" placeholder="Grade" value={updateSubmission.grade} onChange={handleUpdateChange} />
-                <input name="graderNotes" placeholder="Grader Notes" value={updateSubmission.graderNotes} onChange={handleUpdateChange} />
+                <input name="grade" placeholder="Grade" value={updateSubmission.grade ?? ''} onChange={handleUpdateChange} />
+                <input name="graderNotes" placeholder="Grader Notes" value={updateSubmission.graderNotes ?? ''} onChange={handleUpdateChange} />
 
                 <button type="submit">Update Submission</button>
             </form>
 
-            <hr />
+            {/* <hr />
 
             <h3>Delete Submission</h3>
             <form onSubmit={deleteSubmission}>
@@ -248,7 +320,7 @@ function SubmissionsPage() {
                 </select>
 
                 <button type="submit">Delete Submission</button>
-            </form>
+            </form> */}
         </main>
     );
 }
