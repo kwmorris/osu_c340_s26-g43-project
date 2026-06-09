@@ -41,7 +41,7 @@ BEGIN
         staffID varchar(50),
         grade decimal(6,2),
         graderNotes varchar(100),
-        FOREIGN KEY (assignmentID) REFERENCES Assignments(assignmentID) ON DELETE RESTRICT ON UPDATE CASCADE,
+        FOREIGN KEY (assignmentID) REFERENCES Assignments(assignmentID) ON DELETE CASCADE ON UPDATE CASCADE,
         FOREIGN KEY (studentID) REFERENCES Students(studentID) ON DELETE CASCADE ON UPDATE CASCADE,
         FOREIGN KEY (staffID) REFERENCES Staff(staffID) ON DELETE SET NULL ON UPDATE CASCADE
     );
